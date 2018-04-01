@@ -5,8 +5,6 @@ import (
 	"crypto/sha512"
 	"encoding/hex"
 	"encoding/json"
-	"io/ioutil"
-	"net/http"
 	"net/url"
 )
 
@@ -18,7 +16,8 @@ type Client struct {
 	APIKey    string
 	APISecret string
 
-	Trades *TradesService
+	Trades     *TradesService
+	OrderBooks *OrderBooksService
 }
 
 // NewClient creates new API client.
@@ -26,6 +25,9 @@ func NewClient() *Client {
 	baseURL, _ := url.Parse(BaseURL)
 
 	c := &Client{BaseURL: baseURL}
+
+	c.Trades = &TradesService{c: c}
+	c.OrderBooks = &OrderBooksService{c: c}
 
 	return c
 }
@@ -75,37 +77,6 @@ func (c *Client) Auth(key string, secret string) *Client {
 	c.APISecret = secret
 
 	return c
-}
-
-func (c *Client) performRequest(req *http.Request, v interface{}) (*Response, error) {
-	resp, err := http.DefaultClient.Do(req)
-
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		body = []byte(`Error reading body:` + err.Error())
-	}
-
-	response := &Response{resp, body}
-
-	err = checkResponse(response)
-	if err != nil {
-		// Return response in case caller need to debug it.
-		return response, err
-	}
-
-	if v != nil {
-		err = json.Unmarshal(response.Body, v)
-		if err != nil {
-			return response, err
-		}
-	}
-
-	return response, nil
 }
 
 // checkResponse checks response status code and response

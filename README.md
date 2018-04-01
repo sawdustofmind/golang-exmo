@@ -18,6 +18,16 @@ import (
 	"github.com/asxcandrew/golang-exmo/v1"
 )
 
+client := exmo.NewClient()
+	pairs := []string{"BTC_USD", "ETC_USD"}
+
+	trades, err := client.Trades.Get(pairs)
+
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(trades)
+	}
 ```
 
 ### Authentication
