@@ -1,11 +1,15 @@
 package exmo
 
 import (
+	"crypto/hmac"
+	"crypto/sha512"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
+	"time"
 )
 
 const (
@@ -47,6 +51,28 @@ func (c *Client) newRequest(method string, refURL string, params url.Values) (*h
 	return req, nil
 }
 
+// newAuthenticatedRequest creates new http request for authenticated routes.
+func (c *Client) newAuthenticatedRequest(refURL string, params url.Values) (*http.Request, error) {
+	params.Add("nonce", nonce())
+
+	req, err := c.newRequest("POST", refURL, params)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println(req.Body)
+
+	content := params.Encode()
+	sign := signPayload(content, c.APISecret)
+
+	req.Header.Set("Key", c.APIKey)
+	req.Header.Set("Sign", sign)
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Add("Content-Length", strconv.Itoa(len(content)))
+
+	return req, nil
+}
+
 func (c *Client) performRequest(req *http.Request, v interface{}) (*Response, error) {
 	resp, err := http.DefaultClient.Do(req)
 
@@ -76,6 +102,16 @@ func (c *Client) performRequest(req *http.Request, v interface{}) (*Response, er
 	}
 
 	return response, nil
+}
+
+func signPayload(message string, secret string) string {
+	mac := hmac.New(sha512.New, []byte(secret))
+	mac.Write([]byte(message))
+	return fmt.Sprintf("%x", mac.Sum(nil))
+}
+
+func nonce() string {
+	return fmt.Sprintf("%d", time.Now().UnixNano())
 }
 
 func (r *ErrorResponse) Error() string {

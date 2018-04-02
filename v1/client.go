@@ -1,9 +1,6 @@
 package exmo
 
 import (
-	"crypto/hmac"
-	"crypto/sha512"
-	"encoding/hex"
 	"encoding/json"
 	"net/url"
 )
@@ -18,6 +15,8 @@ type Client struct {
 
 	Trades     *TradesService
 	OrderBooks *OrderBooksService
+	Order      *OrderService
+	User       *UserService
 }
 
 // NewClient creates new API client.
@@ -28,47 +27,10 @@ func NewClient() *Client {
 
 	c.Trades = &TradesService{c: c}
 	c.OrderBooks = &OrderBooksService{c: c}
+	c.Order = &OrderService{c: c}
+	c.User = &UserService{c: c}
 
 	return c
-}
-
-// newAuthenticatedRequest creates new http request for authenticated routes.
-// func (c *Client) newAuthenticatedRequest(m string, refURL string, data map[string]interface{}) (*http.Request, error) {
-// 	req, err := c.newRequest(m, refURL, nil)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	nonce := utils.GetNonce()
-// 	payload := map[string]interface{}{
-// 		"request": "/v1/" + refURL,
-// 		"nonce":   nonce,
-// 	}
-
-// 	for k, v := range data {
-// 		payload[k] = v
-// 	}
-
-// 	p, err := json.Marshal(payload)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	encoded := base64.StdEncoding.EncodeToString(p)
-
-// 	req.Header.Add("Content-Type", "application/json")
-// 	req.Header.Add("Accept", "application/json")
-// 	req.Header.Add("X-BFX-APIKEY", c.APIKey)
-// 	req.Header.Add("X-BFX-PAYLOAD", encoded)
-// 	req.Header.Add("X-BFX-SIGNATURE", c.signPayload(encoded))
-
-// 	return req, nil
-// }
-
-func (c *Client) signPayload(payload string) string {
-	sig := hmac.New(sha512.New384, []byte(c.APISecret))
-	sig.Write([]byte(payload))
-	return hex.EncodeToString(sig.Sum(nil))
 }
 
 // Auth sets api key and secret for usage is requests that requires authentication.
