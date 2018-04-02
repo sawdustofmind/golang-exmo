@@ -1,7 +1,6 @@
 package exmo
 
 import (
-	"encoding/json"
 	"net/url"
 )
 
@@ -39,22 +38,4 @@ func (c *Client) Auth(key string, secret string) *Client {
 	c.APISecret = secret
 
 	return c
-}
-
-// checkResponse checks response status code and response
-// for errors.
-func checkResponse(r *Response) error {
-	if c := r.Response.StatusCode; 200 <= c && c <= 299 {
-		return nil
-	}
-
-	// Try to decode error message
-	errorResponse := &ErrorResponse{Response: r}
-	err := json.Unmarshal(r.Body, errorResponse)
-	if err != nil {
-		errorResponse.Message = "Error decoding response error message. " +
-			"Please see response body for more information."
-	}
-
-	return errorResponse
 }

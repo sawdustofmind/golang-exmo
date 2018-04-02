@@ -31,9 +31,8 @@ func (a *TradesService) Get(pairs []string) (Trades, error) {
 		return Trades{}, err
 	}
 
-	var v Trades // 	http.Error(w, "not found", http.StatusNotFound)
-	// 	return
-	// }
+	var v Trades
+
 	_, err = a.c.performRequest(req, &v)
 
 	if err != nil {

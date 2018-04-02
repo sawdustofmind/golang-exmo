@@ -1,6 +1,7 @@
 package exmo
 
 import (
+	"bytes"
 	"crypto/hmac"
 	"crypto/sha512"
 	"encoding/json"
@@ -28,7 +29,8 @@ type Response struct {
 // error.
 type ErrorResponse struct {
 	Response *Response
-	Message  string `json:"message"`
+	Result   bool   `json:"result"`
+	Message  string `json:"error"`
 }
 
 // NewRequest create new API request. Relative url can be provided in refURL.
@@ -40,8 +42,10 @@ func (c *Client) newRequest(method string, refURL string, params url.Values) (*h
 	if params != nil {
 		rel.RawQuery = params.Encode()
 	}
-	var req *http.Request
 	u := c.BaseURL.ResolveReference(rel)
+
+	var req *http.Request
+
 	req, err = http.NewRequest(method, u.String(), nil)
 
 	if err != nil {
@@ -55,14 +59,10 @@ func (c *Client) newRequest(method string, refURL string, params url.Values) (*h
 func (c *Client) newAuthenticatedRequest(refURL string, params url.Values) (*http.Request, error) {
 	params.Add("nonce", nonce())
 
-	req, err := c.newRequest("POST", refURL, params)
-	if err != nil {
-		return nil, err
-	}
-
-	fmt.Println(req.Body)
-
 	content := params.Encode()
+
+	req, _ := http.NewRequest("POST", BaseURL+refURL, bytes.NewBuffer([]byte(content)))
+
 	sign := signPayload(content, c.APISecret)
 
 	req.Header.Set("Key", c.APIKey)
@@ -89,8 +89,8 @@ func (c *Client) performRequest(req *http.Request, v interface{}) (*Response, er
 	response := &Response{resp, body}
 
 	err = checkResponse(response)
+
 	if err != nil {
-		// Return response in case caller need to debug it.
 		return response, err
 	}
 
@@ -102,6 +102,22 @@ func (c *Client) performRequest(req *http.Request, v interface{}) (*Response, er
 	}
 
 	return response, nil
+}
+
+// checkResponse checks response status code and response
+// for errors.
+func checkResponse(r *Response) error {
+	errorResponse := &ErrorResponse{}
+	err := json.Unmarshal(r.Body, errorResponse)
+
+	if err != nil {
+		errorResponse.Message = "Error decoding response error message. " +
+			"Please see response body for more information."
+	} else if !(errorResponse.Message == "") {
+		return errorResponse
+	}
+
+	return nil
 }
 
 func signPayload(message string, secret string) string {
