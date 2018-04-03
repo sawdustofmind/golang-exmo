@@ -33,13 +33,20 @@ client := exmo.NewClient()
 ### Authentication
 
 ``` go
+client := exmo.NewClient().Auth(key, secret)
 
 ```
 
 ### Order create
 
 ``` go
+client := exmo.NewClient().Auth(key, secret)
 
+order, err := client.Order.Create("ETH_UAH", 0.02, 1000.0, "buy")
+
+if err == nil {
+	fmt.Println(order)
+}
 ```
 
 See [examples](https://github.com/asxcandrew/golang-exmo/tree/master/examples)
