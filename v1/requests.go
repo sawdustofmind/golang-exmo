@@ -107,7 +107,7 @@ func (c *Client) performRequest(req *http.Request, v interface{}) (*Response, er
 // checkResponse checks response status code and response
 // for errors.
 func checkResponse(r *Response) error {
-	errorResponse := &ErrorResponse{}
+	errorResponse := &ErrorResponse{Response: r}
 	err := json.Unmarshal(r.Body, errorResponse)
 
 	if err != nil {
