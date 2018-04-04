@@ -1,6 +1,7 @@
 package exmo
 
 import (
+	"errors"
 	"net/url"
 	"strconv"
 )
@@ -13,6 +14,11 @@ type OrderCreateResponse struct {
 	Result  bool
 	Error   string
 	OrderID int64 `json:"order_id,int"`
+}
+
+type OrderCancelResponse struct {
+	Result bool
+	Error  string
 }
 
 //Create OrderService creates order and return orderId
@@ -39,4 +45,31 @@ func (a *OrderService) Create(pair string, quantity float64, price float64, orde
 	}
 
 	return v, nil
+}
+
+//Cancel OrderService cancel order by given id
+func (a *OrderService) Cancel(orderID int64) error {
+	params := url.Values{}
+
+	params.Add("order_id", strconv.Itoa(int(orderID)))
+
+	req, err := a.c.newAuthenticatedRequest("order_cancel", params)
+
+	if err != nil {
+		return err
+	}
+
+	var v OrderCancelResponse
+
+	_, err = a.c.performRequest(req, &v)
+
+	if err != nil {
+		return err
+	}
+
+	if !v.Result {
+		return errors.New(v.Error)
+	}
+
+	return nil
 }
