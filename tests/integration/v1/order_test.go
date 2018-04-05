@@ -13,6 +13,13 @@ package tests
 
 // 	t.Logf("Order created: %d", order.OrderID)
 
+// 	_, err = client.Order.Trades(order.OrderID)
+
+// 	if err != nil {
+// 		t.Logf("Order id: %d is not canceled!", order.OrderID)
+// 		t.Fatalf("Order.Trades() returned error: %v", err)
+// 	}
+
 // 	err = client.Order.Cancel(order.OrderID)
 
 // 	if err != nil {
