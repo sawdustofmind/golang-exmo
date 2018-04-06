@@ -7,23 +7,23 @@ import (
 	"testing"
 )
 
-func GetOrderBooksHandler(w http.ResponseWriter, r *http.Request) {
-	resp := `{
-		"BTC_USD": [
-			{
-				"trade_id": 3,
-				"type": "sell",
-				"price": "100",
-				"quantity": "1",
-				"amount": "100",
-				"date": 1435488248
-			}
-		]
-	}`
-	w.Write([]byte(resp))
-}
-
 func TestTradesServiceGet(t *testing.T) {
+	GetOrderBooksHandler := func(w http.ResponseWriter, r *http.Request) {
+		resp := `{
+			"BTC_USD": [
+				{
+					"trade_id": 3,
+					"type": "sell",
+					"price": "100",
+					"quantity": "1",
+					"amount": "100",
+					"date": 1435488248
+				}
+			]
+		}`
+		w.Write([]byte(resp))
+	}
+
 	server := httptest.NewServer(http.HandlerFunc(GetOrderBooksHandler))
 	defer server.Close()
 
