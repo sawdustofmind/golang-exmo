@@ -16,6 +16,7 @@ type Client struct {
 	OrderBooks *OrderBooksService
 	Order      *OrderService
 	User       *UserService
+	Ticker     *TickerService
 }
 
 // NewClient creates new API client.
@@ -28,6 +29,7 @@ func NewClient() *Client {
 	c.OrderBooks = &OrderBooksService{c: c}
 	c.Order = &OrderService{c: c}
 	c.User = &UserService{c: c}
+	c.Ticker = &TickerService{c: c}
 
 	return c
 }
