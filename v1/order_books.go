@@ -16,8 +16,8 @@ type OrderBookStruct struct {
 	BidQuantity string `json:"bid_quantity"`
 	BidAmount   string `json:"bid_amount"`
 	BidTop      string `json:"bid_top"`
-	Ask         [][]int
-	Bid         [][]int
+	Ask         [][]string
+	Bid         [][]string
 }
 
 type OrderBooks map[string]OrderBookStruct
