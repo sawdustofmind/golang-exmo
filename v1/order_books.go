@@ -1,6 +1,7 @@
 package exmo
 
 import (
+	"fmt"
 	"net/url"
 	"strings"
 )
@@ -23,9 +24,13 @@ type OrderBookStruct struct {
 type OrderBooks map[string]OrderBookStruct
 
 //Get OrderBooksService returns order books for selected pairs
-func (a *OrderBooksService) Get(pairs []string) (OrderBooks, error) {
+func (a *OrderBooksService) Get(pairs []string, limit int) (OrderBooks, error) {
+	if limit == 0 {
+		limit = 100
+	}
 	params := url.Values{}
 	params.Add("pair", strings.Join(pairs, ","))
+	params.Add("limit", fmt.Sprint(limit))
 
 	req, err := a.c.newRequest("GET", "order_book", params)
 
