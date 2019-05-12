@@ -11,7 +11,7 @@ type PairSettingStruct struct {
 	MinAmount   string `json:"min_amount"`
 }
 
-type PairSettings map[string]OrderBookStruct
+type PairSettings map[string]PairSettingStruct
 
 type PairSettingService struct {
 	c *Client
