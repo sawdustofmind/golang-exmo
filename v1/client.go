@@ -12,11 +12,12 @@ type Client struct {
 	APIKey    string
 	APISecret string
 
-	Trades     *TradesService
-	OrderBooks *OrderBooksService
-	Order      *OrderService
-	User       *UserService
-	Ticker     *TickerService
+	Trades      *TradesService
+	OrderBooks  *OrderBooksService
+	Order       *OrderService
+	User        *UserService
+	Ticker      *TickerService
+	PairSetting *PairSettingService
 }
 
 // NewClient creates new API client.
@@ -30,6 +31,7 @@ func NewClient() *Client {
 	c.Order = &OrderService{c: c}
 	c.User = &UserService{c: c}
 	c.Ticker = &TickerService{c: c}
+	c.PairSetting = &PairSettingService{c: c}
 
 	return c
 }
