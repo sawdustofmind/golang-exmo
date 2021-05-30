@@ -15,7 +15,7 @@ import (
 
 const (
 	// BaseURL is root API url
-	BaseURL = "https://api.exmo.com/v1/"
+	BaseURL = "https://api.exmo.com/v1.1/"
 )
 
 // Response is wrapper for standard http.Response and provides
